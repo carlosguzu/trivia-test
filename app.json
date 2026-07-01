@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Microsoft Trivia",
+    "slug": "microsoft-trivia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0a1f44"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0a1f44"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0a6fb0b7-ed65-4fb2-9294-1ab1bac55055"
+      }
+    }
+  }
+}
