@@ -18,7 +18,8 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#0a1f44"
-      }
+      },
+      "package": "com.c82677.microsofttrivia"
     },
     "extra": {
       "eas": {
