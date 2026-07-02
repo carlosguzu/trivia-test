@@ -4,3 +4,14 @@ dist/
 npm-debug.*
 *.log
 .DS_Store
+
+# NUNCA subir credenciales ni el keystore a GitHub
+*.keystore
+*.jks
+credentials.json
+google-services.json
+*.md
+
+# Builds locales
+*.apk
+*.aab
