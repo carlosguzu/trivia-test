@@ -4,7 +4,7 @@
 //   - options: un arreglo de 4 respuestas posibles
 //   - answer: el índice (0-3) de la opción correcta dentro de "options"
 
-export const QUESTIONS = [
+const RAW_QUESTIONS = [
   {
     question: '¿En qué año fue fundada Microsoft?',
     options: ['1971', '1975', '1980', '1985'],
@@ -66,3 +66,23 @@ export const QUESTIONS = [
     answer: 2,
   },
 ];
+
+function validateQuestions(questions) {
+  return questions.filter((q, i) => {
+    if (!q || typeof q.question !== 'string') {
+      console.warn(`Pregunta ${i}: falta el texto de la pregunta, se omite.`);
+      return false;
+    }
+    if (!Array.isArray(q.options) || q.options.length === 0) {
+      console.warn(`Pregunta ${i}: opciones inválidas, se omite.`);
+      return false;
+    }
+    if (typeof q.answer !== 'number' || q.answer < 0 || q.answer >= q.options.length) {
+      console.warn(`Pregunta ${i}: índice de respuesta fuera de rango (${q.answer}), se omite.`);
+      return false;
+    }
+    return true;
+  });
+}
+
+export const QUESTIONS = validateQuestions(RAW_QUESTIONS);

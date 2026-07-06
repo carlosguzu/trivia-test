@@ -5,7 +5,7 @@
 //   - 4 opciones para responder
 //   - contar los aciertos y mostrar el resultado final
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -16,11 +16,20 @@ import {
 } from 'react-native';
 import { QUESTIONS } from './src/questions';
 import CircularTimer from './src/CircularTimer';
+import ErrorBoundary from './src/ErrorBoundary';
 
 const TIME_PER_QUESTION = 12; // segundos por pregunta
 const UPDATE_INTERVAL = 0.1; // actualizar cada 100ms para animación fluida
 
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <TriviaGame />
+    </ErrorBoundary>
+  );
+}
+
+function TriviaGame() {
   // Índice de la pregunta actual (0 a 10).
   const [current, setCurrent] = useState(0);
   // Opción que el usuario tocó (null si todavía no responde).
@@ -34,8 +43,42 @@ export default function App() {
 
   // Guardamos el id del intervalo para poder detenerlo.
   const timerRef = useRef(null);
+  // Guardamos el id del setTimeout de transición para limpiarlo al desmontar.
+  const transitionRef = useRef(null);
 
-  const question = QUESTIONS[current];
+  // Validación: si el índice está fuera de rango tratamos la trivia como terminada.
+  if (!QUESTIONS || QUESTIONS.length === 0) {
+    console.error('QUESTIONS está vacío o no fue cargado correctamente.');
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.resultBox}>
+          <Text style={styles.resultTitle}>Error</Text>
+          <Text style={styles.resultMsg}>No se pudieron cargar las preguntas.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const safeIndex = Math.min(current, QUESTIONS.length - 1);
+  const question = QUESTIONS[safeIndex];
+
+  // Avanza a la siguiente pregunta o termina la trivia.
+  const goNext = useCallback(() => {
+    if (current + 1 >= QUESTIONS.length) {
+      setFinished(true);
+    } else {
+      setCurrent((c) => c + 1);
+      setSelected(null);
+      setTimeLeft(TIME_PER_QUESTION);
+    }
+  }, [current]);
+
+  // Cuando se acaba el tiempo sin responder.
+  const handleTimeout = useCallback(() => {
+    setSelected(-1); // -1 significa "sin respuesta / tiempo agotado"
+    transitionRef.current = setTimeout(goNext, 1200);
+  }, [goNext]);
 
   // Este efecto arranca el temporizador cada vez que cambia la pregunta.
   useEffect(() => {
@@ -56,38 +99,31 @@ export default function App() {
 
     // Limpieza: detenemos el temporizador cuando el efecto se vuelve a ejecutar.
     return () => clearInterval(timerRef.current);
-  }, [current, selected, finished]);
+  }, [current, selected, finished, handleTimeout]);
 
-  // Cuando se acaba el tiempo sin responder.
-  const handleTimeout = () => {
-    setSelected(-1); // -1 significa "sin respuesta / tiempo agotado"
-    setTimeout(goNext, 1200);
-  };
+  // Limpieza del setTimeout de transición al desmontar el componente.
+  useEffect(() => {
+    return () => {
+      clearTimeout(transitionRef.current);
+    };
+  }, []);
 
   // Cuando el usuario toca una opción.
   const handleAnswer = (index) => {
     if (selected !== null) return; // evita responder dos veces
     clearInterval(timerRef.current);
     setSelected(index);
-    if (index === question.answer) {
+    if (question && index === question.answer) {
       setScore((s) => s + 1);
     }
-    setTimeout(goNext, 1200); // esperamos un momento para ver el resultado
-  };
-
-  // Avanza a la siguiente pregunta o termina la trivia.
-  const goNext = () => {
-    if (current + 1 >= QUESTIONS.length) {
-      setFinished(true);
-    } else {
-      setCurrent((c) => c + 1);
-      setSelected(null);
-      setTimeLeft(TIME_PER_QUESTION);
-    }
+    clearTimeout(transitionRef.current);
+    transitionRef.current = setTimeout(goNext, 1200); // esperamos un momento para ver el resultado
   };
 
   // Reinicia todo para volver a jugar.
   const restart = () => {
+    clearTimeout(transitionRef.current);
+    clearInterval(timerRef.current);
     setCurrent(0);
     setSelected(null);
     setScore(0);
