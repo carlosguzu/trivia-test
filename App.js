@@ -115,7 +115,7 @@ export default function App() {
           </Text>
           <Text style={styles.resultMsg}>
             {score >= 9
-              ? '¡Excelente! Sabes mucho de Microsoft.'
+              ? '¡Excelente! Sabes mucho de Tesla.'
               : score >= 6
               ? '¡Bien! Pero puedes mejorar.'
               : 'Sigue practicando 💪'}
