@@ -17,6 +17,9 @@ export function useTimer(duration, { paused = false, onTimeout }) {
   useEffect(() => {
     if (paused) return;
 
+    // Reset to full duration whenever the timer starts (e.g. new question).
+    setTimeLeft(duration);
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= TIMER_UPDATE_INTERVAL) {
