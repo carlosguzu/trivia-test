@@ -5,11 +5,16 @@ npm-debug.*
 *.log
 .DS_Store
 
-# NUNCA subir credenciales ni el keystore a GitHub
+# Credentials and signing keys
 *.keystore
 *.jks
+*.pem
+*.p12
+*.key
 credentials.json
 google-services.json
+.env
+.env.*
 *.md
 
 # Builds locales
