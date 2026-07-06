@@ -7,24 +7,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { COLORS } from './constants/colors';
 
 export default function CircularTimer({ timeLeft, total, size = 120, strokeWidth = 10 }) {
-  // El radio del círculo (dejamos espacio para el grosor del borde).
   const radius = (size - strokeWidth) / 2;
-  // La circunferencia = 2 * PI * radio. Es el "largo" total de la línea del círculo.
   const circumference = 2 * Math.PI * radius;
 
-  // fracción de tiempo que queda (entre 0 y 1).
   const progress = Math.max(timeLeft, 0) / total;
-
-  // strokeDashoffset controla cuánto del círculo está "escondido".
-  // Cuando queda menos tiempo, escondemos más parte del círculo.
   const strokeDashoffset = circumference * (1 - progress);
 
   // Cambiamos el color según el tiempo que queda (verde -> naranja -> rojo).
-  let color = '#22c55e';
-  if (timeLeft <= 3) color = '#ef4444';
-  else if (timeLeft <= 6) color = '#f59e0b';
+  let color = COLORS.success;
+  if (timeLeft <= 3) color = COLORS.error;
+  else if (timeLeft <= 6) color = COLORS.warning;
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
@@ -34,7 +29,7 @@ export default function CircularTimer({ timeLeft, total, size = 120, strokeWidth
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#1e3a5f"
+          stroke={COLORS.border}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -49,7 +44,6 @@ export default function CircularTimer({ timeLeft, total, size = 120, strokeWidth
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          // Rotamos el círculo para que empiece a consumirse desde arriba.
           rotation="-90"
           origin={`${size / 2}, ${size / 2}`}
         />
@@ -77,6 +71,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: COLORS.textSecondary,
   },
 });
